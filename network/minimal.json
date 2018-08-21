@@ -5,7 +5,7 @@
   "R3": {"reaction": {"B": -1, "F": 1}, "regulation": []},
   "R4": {"reaction": {"C": -1, "G": 1}, "regulation": []},
   "R5a": {"reaction": {"G": -1, "C": 0.8, "NADH": 2}, "regulation": ["not", "RPO2"]},
-  "R5b": {"reaction": {"G": -1, "C": 0.8, "NADH": 2}, "regulation": ["if", "RPO2"]},
+  "R5b": {"reaction": {"G": -1, "C": 0.8, "NADH": 2}, "regulation": ["is", "RPO2"]},
   "R6": {"reaction": {"C": -1, "ATP": 2, "D": 3}, "regulation": []},
   "R7": {"reaction": {"C": -1, "NADH": -4, "E": 3}, "regulation": ["not", "RPb"]},
   "R8a": {"reaction": {"G": -1, "ATP": -1, "NADH": -2, "H": 1}, "regulation": ["not", "RPh"]},
@@ -21,9 +21,9 @@
   "Growth": {"reaction": {"C": -1, "F": -1, "H": -1, "ATP": -10, "Biomass": 1}, "regulation": []}},
  "regulation":
  {"RPO2": ["not", "Oxygen"],
-  "RPc1": ["if", "Carbon1"],
+  "RPc1": ["is", "Carbon1"],
   "RPh": [">", "v[Th]", 0],
- "RPb": [">", "v[R2b]", 0]},
+  "RPb": [">", "v[R2b]", 0]},
  "constraints":
  {"Carbon1": 10.5,
   "Carbon2": 10.5,
