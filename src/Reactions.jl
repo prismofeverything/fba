@@ -78,7 +78,7 @@ function buildrow(molecules, regulation, reaction, ops)
     end
 end
 
-function buildmatrix(molecules, reactions, network, state, ops)
+function buildstoichiometry(molecules, reactions, network, state, ops)
     regulation = applylogic(network["regulation"], state, ops)
     hcat(map(r -> buildrow(molecules, regulation, network["reactions"][r], ops), reactions)...)
 end
@@ -87,7 +87,7 @@ function initialize(network, ops)
     state = moleculestate(network)
     molecules = sort(collect(keys(state)))
     reactions = sort(collect(keys(network["reactions"])))
-    stoichiometry = buildmatrix(molecules, reactions, network, state, ops)
+    stoichiometry = buildstoichiometry(molecules, reactions, network, state, ops)
 
     Dict(
         "molecules" => molecules,
