@@ -1,4 +1,5 @@
 module Reactions
+
 import JSON
 
 function readreactions(path)
@@ -6,11 +7,14 @@ function readreactions(path)
     open(path) do file
         for line in enumerate(eachline(file))
             if line[1] > 1
-                parts = line[2].split("	")
+                parts = split(line[2], "	")
+                key = JSON.parse(parts[1])
                 inner = JSON.parse(parts[2])
-                reactions[parts[1]] = JSON.parse(parts[2])
+                reactions[key] = inner
             end
         end
     end
     reactions
+end
+
 end

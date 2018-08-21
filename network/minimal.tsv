@@ -1,7 +1,7 @@
 "reaction id" "stoichiometry" "is reversible" "catalyzed by"
 "R1"	{"A": -1, "ATP": -1, "B": 1}	true	["R1"]
 "R2a"	{"B": -1, "ATP": 2, "NADH": 2, "C": 1}	true	["R2a"]
-"R2b"	{"C": -1, "ATP": -2, "NADH": -2, "B": 1}	true	["R2b"]
+"R2b"	{"B": 1, "ATP": -2, "NADH": -2, "C": -1}	true	["R2b"]
 "R3"	{"B": -1, "F": 1}	true	["R3"]
 "R4"	{"C": -1, "G": 1}	true	["R4"]
 "R5a"	{"G": -1, "C": 0.8, "NADH": 2}	true	["R5a"]
@@ -10,7 +10,7 @@
 "R7"	{"C": -1, "NADH": -4, "E": 3}	true	["R7"]
 "R8a"	{"G": -1, "ATP": -1, "NADH": -2, "H": 1}	true	["R8a"]
 "R8b"	{"G": 1, "ATP": 1, "NADH": 2, "H": -1}	true	["R8b"]
-"Rres"	{"NADH": -1, "O2": 1, "ATP": 1}	true	["Rres"]
+"Rres"	{"NADH": -1, "O2": -1, "ATP": 1}	true	["Rres"]
 "Tc1"	{"Carbon1": -1, "A": 1}	true	["Tc1"]
 "Tc2"	{"Carbon2": -1, "A": 1}	true	["Tc2"]
 "Tf"	{"Fext": -1, "F": 1}	true	["Tf"]
