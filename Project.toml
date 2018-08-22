@@ -4,5 +4,6 @@ authors = ["Ryan Spangler <ryan.spangler@gmail.com>"]
 version = "0.1.0"
 
 [deps]
-Iterators = "a4bce56a-f44e-563f-a45f-5312daf41243"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+MathProgBase = "fdba3010-5040-5b88-9595-932c9decdf73"
+NLopt = "76087f3c-5699-56af-9a33-bf431cd00edd"
