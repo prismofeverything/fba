@@ -4,8 +4,8 @@ import JSON
 import MathProgBase
 import GLPKMathProgInterface
 
-function readnetwork(path)
-    JSON.parsefile("network/$path.json")
+function readnetwork(name)
+    JSON.parsefile("network/$name.json")
 end
 
 function selectkeys(dict, ks)
@@ -55,8 +55,8 @@ function buildcolumn(molecules, reaction)
     map(m -> m in keys(reaction) ? reaction[m] : 0, molecules)
 end
 
-function buildstoichiometry(molecules, reactions, network)
-    columns = [buildcolumn(molecules, network["reactions"][reaction]["reaction"]) for reaction in reactions]
+function buildstoichiometry(molecules, reactions, active)
+    columns = [buildcolumn(molecules, reactions[reaction]["reaction"]) for reaction in active]
     hcat(columns...)
 end
 
@@ -70,7 +70,7 @@ function initialize(network, ops)
 
     lower = boundsvector(active, network["lower"], -Inf)
     upper = boundsvector(active, network["upper"], Inf)
-    stoichiometry = buildstoichiometry(molecules, active, network)
+    stoichiometry = buildstoichiometry(molecules, network["reactions"], active)
 
     Dict(
         "molecules" => molecules,
