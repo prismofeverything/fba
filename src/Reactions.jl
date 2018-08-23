@@ -1,6 +1,8 @@
 module Reactions
 
 import JSON
+import MathProgBase
+import GLPKMathProgInterface
 
 function readtsv(path)
     reactions = Dict{String, Dict{String, Float64}}()
@@ -65,6 +67,10 @@ function applylogic(logicmap, state, ops)
     Dict(key => runlogic(logic, state, ops) for (key, logic) in logicmap)
 end
 
+function boundsvector(molecules, bounds)
+    [get(bounds, molecule, Inf) for molecule in molecules]
+end
+
 function buildcolumn(molecules, reaction)
     map(m -> m in keys(reaction) ? reaction[m] : 0, molecules)
 end
@@ -87,13 +93,32 @@ function initialize(network, ops)
     state = moleculestate(network)
     molecules = sort(collect(keys(state)))
     reactions = sort(collect(keys(network["reactions"])))
+    bounds = boundsvector(molecules, network["constraints"])
     stoichiometry = buildstoichiometry(molecules, reactions, network, state, ops)
 
     Dict(
         "molecules" => molecules,
         "reactions" => reactions,
+        "bounds" => bounds,
         "stoichiometry" => stoichiometry
     )
+end
+
+function fluxbalanceanalysis(network, maximize)
+    conditions = initialize(network, logicoperations)
+    solver = GLPKMathProgInterface.GLPKSolverLP(method=:Simplex, presolve=true)
+    objective = [-get(maximize, molecule, -0.0) for molecule in conditions["molecules"]]
+    solution = MathProgBase.linprog(
+        objective,
+        transpose(conditions["stoichiometry"]),
+        '=',
+        0.0,
+        0.0,
+        conditions["bounds"],
+        solver
+    )
+
+    Dict(zip(conditions["molecules"], solution.sol))
 end
 
 end
