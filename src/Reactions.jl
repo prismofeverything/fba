@@ -67,8 +67,8 @@ function applylogic(logicmap, state, ops)
     Dict(key => runlogic(logic, state, ops) for (key, logic) in logicmap)
 end
 
-function boundsvector(molecules, bounds)
-    [get(bounds, molecule, Inf) for molecule in molecules]
+function boundsvector(reactions, bounds, extreme)
+    [get(bounds, reaction, extreme) for reaction in reactions]
 end
 
 function buildcolumn(molecules, reaction)
@@ -93,13 +93,15 @@ function initialize(network, ops)
     state = moleculestate(network)
     molecules = sort(collect(keys(state)))
     reactions = sort(collect(keys(network["reactions"])))
-    bounds = boundsvector(molecules, network["constraints"])
+    lower = boundsvector(reactions, network["lower"], -Inf)
+    upper = boundsvector(reactions, network["upper"], Inf)
     stoichiometry = buildstoichiometry(molecules, reactions, network, state, ops)
 
     Dict(
         "molecules" => molecules,
         "reactions" => reactions,
-        "bounds" => bounds,
+        "lower" => lower,
+        "upper" => upper,
         "stoichiometry" => stoichiometry
     )
 end
@@ -107,18 +109,19 @@ end
 function fluxbalanceanalysis(network, maximize)
     conditions = initialize(network, logicoperations)
     solver = GLPKMathProgInterface.GLPKSolverLP(method=:Simplex, presolve=true)
-    objective = [-get(maximize, molecule, -0.0) for molecule in conditions["molecules"]]
+    objective = [get(maximize, reaction, 0.0) for reaction in conditions["reactions"]]
+
     solution = MathProgBase.linprog(
         objective,
-        transpose(conditions["stoichiometry"]),
+        conditions["stoichiometry"],
         '=',
         0.0,
-        0.0,
-        conditions["bounds"],
+        conditions["lower"],
+        conditions["upper"],
         solver
     )
 
-    Dict(zip(conditions["molecules"], solution.sol))
+    Dict(zip(conditions["reactions"], solution.sol))
 end
 
 end

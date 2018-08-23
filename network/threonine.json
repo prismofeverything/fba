@@ -1,0 +1,21 @@
+{"reactions":
+ {"VthrB": {"reaction": {"hms": -1, "ATP": -1, "ADP": 1, "H+": 2, "phs": 1}, "regulation": []},
+  "VthrC": {"reaction": {"phs": -1, "H2O": -1, "phos": 1, "thr": 1}, "regulation": []},
+  "Bhms": {"reaction": {"hms": 1}, "regulation": []},
+  "BATP": {"reaction": {"ATP": 1}, "regulation": []},
+  "BADP": {"reaction": {"ADP": 1}, "regulation": []},
+  "BH+": {"reaction": {"H+": 1}, "regulation": []},
+  "Bphs": {"reaction": {"phs": 1}, "regulation": []},
+  "BH2O": {"reaction": {"H2O": 1}, "regulation": []},
+  "Bphos": {"reaction": {"phos": 1}, "regulation": []},
+  "Bthr": {"reaction": {"thr": 1}, "regulation": []}},
+ "regulation": {},
+ "lower":
+ {"VthrC": 0,
+  "Bhms": 0,
+  "Bphs": 0},
+ "upper":
+ {"Bhms": 10,
+  "Bphs": 0},
+ "initial":
+ {}}

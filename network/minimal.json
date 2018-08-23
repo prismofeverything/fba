@@ -1,7 +1,7 @@
 {"reactions":
  {"R1": {"reaction": {"A": -1, "ATP": -1, "B": 1}, "regulation": []},
   "R2a": {"reaction": {"B": -1, "ATP": 2, "NADH": 2, "C": 1}, "regulation": ["not", "RPb"]},
-  "R2b": {"reaction": {"B": 1, "ATP": -2, "NADH": -2, "C": -1}, "regulation": []},
+  "R2b": {"reaction": {"C": -1, "ATP": -2, "NADH": -2, "B": 1}, "regulation": []},
   "R3": {"reaction": {"B": -1, "F": 1}, "regulation": []},
   "R4": {"reaction": {"C": -1, "G": 1}, "regulation": []},
   "R5a": {"reaction": {"G": -1, "C": 0.8, "NADH": 2}, "regulation": ["not", "RPO2"]},
@@ -22,15 +22,20 @@
  "regulation":
  {"RPO2": ["not", "Oxygen"],
   "RPc1": ["is", "Carbon1"],
-  "RPh": [">", "v[Th]", 0],
-  "RPb": [">", "v[R2b]", 0]},
- "constraints":
- {"Carbon1": 10.5,
-  "Carbon2": 10.5,
-  "D": 12.0,
-  "E": 12.0,
-  "F": 5.0,
-  "H": 5.0,
-  "O2": 15.0},
+  "RPh": [">", "Th", 0],
+  "RPb": [">", "R2b", 0]},
+ "lower":
+ {},
+ "upper":
+ {"Tc1": 10.5,
+  "Tc2": 10.5,
+  "Td": 12.0,
+  "Te": 12.0,
+  "Tf": 5.0,
+  "Th": 5.0,
+  "To2": 15.0},
  "initial":
- {}}
+ {"Oxygen": 1,
+  "Carbon1": 1,
+  "RPh": 1,
+  "RPb": 1}}
