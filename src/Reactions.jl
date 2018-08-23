@@ -4,23 +4,12 @@ import JSON
 import MathProgBase
 import GLPKMathProgInterface
 
-function readtsv(path)
-    reactions = Dict{String, Dict{String, Float64}}()
-    open(path) do file
-        for line in enumerate(eachline(file))
-            if line[1] > 1
-                parts = split(line[2], "	")
-                key = JSON.parse(parts[1])
-                inner = JSON.parse(parts[2])
-                reactions[key] = inner
-            end
-        end
-    end
-    reactions
+function readnetwork(path)
+    JSON.parsefile("network/$path.json")
 end
 
-function readjson(path)
-    JSON.parsefile(path)
+function selectkeys(dict, ks)
+    Dict([pair for pair in collect(dict) if pair[1] in ks])
 end
 
 logicoperations = Dict(
@@ -30,24 +19,6 @@ logicoperations = Dict(
     "and" => all,
     "or" => any
 )
-
-function moleculestate(network)
-    molecules = Dict{String, Float64}()
-
-    for molecule in keys(network["initial"])
-        molecules[molecule] = network["initial"][molecule]
-    end
-
-    for reaction in keys(network["reactions"])
-        for molecule in keys(network["reactions"][reaction]["reaction"])
-            if !(molecule in keys(molecules))
-                molecules[molecule] = 0
-            end
-        end
-    end
-
-    molecules
-end
 
 function runlogic(logic, state, ops)
     if isa(logic, Number)
@@ -67,6 +38,15 @@ function applylogic(logicmap, state, ops)
     Dict(key => runlogic(logic, state, ops) for (key, logic) in logicmap)
 end
 
+function moleculestate(network)
+    keysets = [keys(reaction["reaction"]) for reaction in values(network["reactions"])]
+    molecules = union(keysets...)
+    state = Dict(zip(molecules, zeros(length(molecules))))
+    initial = selectkeys(network["initial"], molecules)
+
+    merge(state, initial)
+end
+
 function boundsvector(reactions, bounds, extreme)
     [get(bounds, reaction, extreme) for reaction in reactions]
 end
@@ -75,31 +55,27 @@ function buildcolumn(molecules, reaction)
     map(m -> m in keys(reaction) ? reaction[m] : 0, molecules)
 end
 
-function buildrow(molecules, regulation, reaction, ops)
-    allowed = runlogic(reaction["regulation"], regulation, ops)
-    if allowed
-        buildcolumn(molecules, reaction["reaction"])
-    else
-        zeros(Float64, length(molecules))
-    end
-end
-
-function buildstoichiometry(molecules, reactions, network, state, ops)
-    regulation = applylogic(network["regulation"], state, ops)
-    hcat(map(r -> buildrow(molecules, regulation, network["reactions"][r], ops), reactions)...)
+function buildstoichiometry(molecules, reactions, network)
+    columns = [buildcolumn(molecules, network["reactions"][reaction]["reaction"]) for reaction in reactions]
+    hcat(columns...)
 end
 
 function initialize(network, ops)
     state = moleculestate(network)
     molecules = sort(collect(keys(state)))
     reactions = sort(collect(keys(network["reactions"])))
-    lower = boundsvector(reactions, network["lower"], -Inf)
-    upper = boundsvector(reactions, network["upper"], Inf)
-    stoichiometry = buildstoichiometry(molecules, reactions, network, state, ops)
+
+    regulation = applylogic(network["regulation"], merge(state, network["initial"]), ops)
+    active = filter(r -> runlogic(network["reactions"][r]["regulation"], regulation, ops), reactions)
+
+    lower = boundsvector(active, network["lower"], -Inf)
+    upper = boundsvector(active, network["upper"], Inf)
+    stoichiometry = buildstoichiometry(molecules, active, network)
 
     Dict(
         "molecules" => molecules,
         "reactions" => reactions,
+        "active" => active,
         "lower" => lower,
         "upper" => upper,
         "stoichiometry" => stoichiometry
@@ -109,7 +85,8 @@ end
 function fluxbalanceanalysis(network, maximize)
     conditions = initialize(network, logicoperations)
     solver = GLPKMathProgInterface.GLPKSolverLP(method=:Simplex, presolve=true)
-    objective = [get(maximize, reaction, 0.0) for reaction in conditions["reactions"]]
+    objective = [get(maximize, reaction, 0.0) for reaction in conditions["active"]]
+    println(objective)
 
     solution = MathProgBase.linprog(
         objective,
@@ -121,7 +98,7 @@ function fluxbalanceanalysis(network, maximize)
         solver
     )
 
-    Dict(zip(conditions["reactions"], solution.sol))
+    Dict(zip(conditions["active"], solution.sol))
 end
 
 end
