@@ -86,7 +86,6 @@ function fluxbalanceanalysis(network, maximize)
     conditions = initialize(network, logicoperations)
     solver = GLPKMathProgInterface.GLPKSolverLP(method=:Simplex, presolve=true)
     objective = [get(maximize, reaction, 0.0) for reaction in conditions["active"]]
-    println(objective)
 
     solution = MathProgBase.linprog(
         objective,
