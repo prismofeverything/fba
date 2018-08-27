@@ -128,33 +128,40 @@ The initial state of the molecules and fluxes in the system. These are read by t
 Once you have a working network, you can solve the flux balance analysis problem directly with 
 
     julia> solution = Reactions.fluxbalanceanalysis(network, objective)
+    Dict{String,Float64} with 10 entries:
+      "BATP"  => 10.0
+      "VthrB" => 10.0
+      "BH2O"  => 10.0
+      "Bthr"  => -10.0
+      "VthrC" => 10.0
+      "BADP"  => -10.0
+      "Bhms"  => 10.0
+      "Bphs"  => 0.0
+      "Bphos" => -10.0
+      "BH+"   => -20.0
 
 The `network` argument is the network described above. The `objective` argument is a dictionary of reaction names to numbers representing the relative importance to the optimization problem. Any reactions omitted from this dictionary are assumed to be zero.
 
 If you want to see what the stoichiometric matrix that represents the reactions is before solving the problem you can call `initialize` directly:
 
     julia> state = Reactions.initialize(network, Reactions.logicoperations)
+    Dict{String,Array} with 6 entries:
+      "active"        => ["BADP", "BATP", "BH+", "BH2O", "Bhms", "Bphos", "Bphs", "Bthr", "VthrB", "VthrC"]
+      "molecules"     => ["ADP", "ATP", "H+", "H2O", "hms", "phos", "phs", "thr"]
+      "lower"         => Real[-Inf, -Inf, -Inf, -Inf, 0, -Inf, 0, -Inf, -Inf, 0]
+      "reactions"     => ["BADP", "BATP", "BH+", "BH2O", "Bhms", "Bphos", "Bphs", "Bthr", "VthrB", "VthrC"]
+      "upper"         => Real[Inf, Inf, Inf, Inf, 10, Inf, 0, Inf, Inf, Inf]
+      "stoichiometry" => [1 0 … 1 0; 0 1 … -1 0; … ; 0 0 … 1 -1; 0 0 … 0 1]
 
 The matrix lives under the `stoichiometry` key:
 
     julia> state["stoichiometry"]
-    19×18 Array{Real,2}:
-       0  -1   0   0   0   0   0     0   0   0   0   0   1   0   0   0   0   0
-     -10  -1   2  -2   0   0   0     2   0  -1   1   1   0   0   0   0   0   0
-       0   1  -1   1  -1   0   0     0   0   0   0   0   0   0   0   0   0   0
-       1   0   0   0   0   0   0     0   0   0   0   0   0   0   0   0   0   0
-      -1   0   1  -1   0  -1   0.8  -1  -1   0   0   0   0   0   0   0   0   0
-       0   0   0   0   0   0   0     0   0   0   0   0  -1   0   0   0   0   0
-       0   0   0   0   0   0   0     0   0   0   0   0   0   0   0   0   0   0
-       0   0   0   0   0   0   0     3   0   0   0   0   0  -1   0   0   0   0
-       0   0   0   0   0   0   0     0   0   0   0   0   0   1   0   0   0   0
-       0   0   0   0   0   0   0     0   3   0   0   0   0   0  -1   0   0   0
-       0   0   0   0   0   0   0     0   0   0   0   0   0   0   1   0   0   0
-      -1   0   0   0   1   0   0     0   0   0   0   0   0   0   0   1   0   0
-       0   0   0   0   0   0   0     0   0   0   0   0   0   0   0  -1   0   0
-       0   0   0   0   0   1  -1     0   0  -1   1   0   0   0   0   0   0   0
-      -1   0   0   0   0   0   0     0   0   1  -1   0   0   0   0   0   1   0
-       0   0   0   0   0   0   0     0   0   0   0   0   0   0   0   0  -1   0
-       0   0   2  -2   0   0   2     0  -4  -2   2  -1   0   0   0   0   0   0
-       0   0   0   0   0   0   0     0   0   0   0  -1   0   0   0   0   0   1
-       0   0   0   0   0   0   0     0   0   0   0   0   0   0   0   0   0  -1
+    8×10 Array{Int64,2}:
+     1  0  0  0  0  0  0  0   1   0
+     0  1  0  0  0  0  0  0  -1   0
+     0  0  1  0  0  0  0  0   2   0
+     0  0  0  1  0  0  0  0   0  -1
+     0  0  0  0  1  0  0  0  -1   0
+     0  0  0  0  0  1  0  0   0   1
+     0  0  0  0  0  0  1  0   1  -1
+     0  0  0  0  0  0  0  1   0   1
