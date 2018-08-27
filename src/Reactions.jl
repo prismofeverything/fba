@@ -4,17 +4,17 @@ import JSON
 import MathProgBase
 import GLPKMathProgInterface
 
-"read a local network from the example network directory"
+"Read a local network from the example network directory"
 function readnetwork(name)
     JSON.parsefile("network/$name.json")
 end
 
-"select a subset of a dictionary with the given keys"
+"Select a subset of a dictionary with the given keys"
 function selectkeys(dict, ks)
     Dict([pair for pair in collect(dict) if pair[1] in ks])
 end
 
-"default logical operations for evaluating regulation expressions"
+"Default logical operations for evaluating regulation expressions"
 logicoperations = Dict(
     "is" => x -> isa(x[1], Bool) ? x[1] : x[1] > 0,
     "not" => x -> isa(x[1], Bool) ? !x[1] : x[1] == 0,
@@ -23,7 +23,7 @@ logicoperations = Dict(
     "or" => any
 )
 
-"evaluate logical expressions governing regulation"
+"Evaluate logical expressions governing regulation"
 function runlogic(logic, state, ops)
     if isa(logic, Number)
         logic
@@ -38,12 +38,12 @@ function runlogic(logic, state, ops)
     end
 end
 
-"substitute the values of a dictionary representing logical expressions with their values given the supplied state"
+"Substitute the values of a dictionary representing logical expressions with their values given the supplied state"
 function applylogic(logicmap, state, ops)
     Dict(key => runlogic(logic, state, ops) for (key, logic) in logicmap)
 end
 
-"extract the initial state of the molecules in a network"
+"Extract the initial state of the molecules in a network"
 function moleculestate(network)
     keysets = [keys(reaction["reaction"]) for reaction in values(network["reactions"])]
     molecules = union(keysets...)
@@ -53,23 +53,23 @@ function moleculestate(network)
     merge(state, initial)
 end
 
-"build the bounds vector with the given default extreme if missing"
+"Build the bounds vector with the given default extreme if missing"
 function boundsvector(reactions, bounds, extreme)
     [get(bounds, reaction, extreme) for reaction in reactions]
 end
 
-"build one column of the stoichiometric matrix from the dictionary describing the molecules involved in the reaction"
+"Build one column of the stoichiometric matrix from the dictionary describing the molecules involved in the reaction"
 function buildcolumn(molecules, reaction)
     map(m -> m in keys(reaction) ? reaction[m] : 0, molecules)
 end
 
-"build the stoichiometric matrix from the given dictionary of reactions describing what molecules are consumed and produced"
+"Build the stoichiometric matrix from the given dictionary of reactions describing what molecules are consumed and produced"
 function buildstoichiometry(molecules, reactions, active)
     columns = [buildcolumn(molecules, reactions[reaction]["reaction"]) for reaction in active]
     hcat(columns...)
 end
 
-"initialize the parameters of the linear programming problem given the network description"
+"Initialize the parameters of the linear programming problem given the network description"
 function initialize(network, ops)
     state = moleculestate(network)
     molecules = sort(collect(keys(state)))
@@ -92,7 +92,7 @@ function initialize(network, ops)
     )
 end
 
-"perform the linear programming for the flux balance analysis problem defined by the given network and maximization vector"
+"Perform the linear programming for the flux balance analysis problem defined by the given network and maximization vector"
 function fluxbalanceanalysis(network, objective)
     conditions = initialize(network, logicoperations)
     solver = GLPKMathProgInterface.GLPKSolverLP(method=:Simplex, presolve=true)
